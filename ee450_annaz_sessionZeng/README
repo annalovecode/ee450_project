@@ -1,0 +1,140 @@
+***************************************************************************************************
+
+
+Full Name: Anna Zhao
+USC ID: 7453052642
+
+
+***************************************************************************************************
+
+
+What you have done in the assignment:
+
+This project implements four coherent files - a front end client, central (main server) and 3 server used to process the input. In this project, I implement a model of a social matching service where two clients issue a request for finding their compatibility. The Central server will connect to the Topology server
+(server T) which has the user social network information and Central server has to connect as well to the Score server (server S) which stores the compatibility scores for each user. Finally, the server P will use the network topology and scores to generate a graph that connects both users, and provide the smallest matching gap between them. The clientA and clientB establishes a TCP connection with the central to send its own name and receive the result. The central builds a UDP connection with server T, server S and server P to send client's  name and receive compatibility information and result. 
+
+***************************************************************************************************
+
+What your code files are and what each one of them does:
+
+*clientA.cpp:
+	Using './clientA <location index>' to input client's name after central and three servers boot up. The client connects to the central by TCP socket, then send its name and together with B's name to get back  the result of  compatiblity. 
+
+-------------------------------------------------------------------------------------
+
+*clientB.cpp:
+	Using './clientB <location index>' to input client's name after central and three servers boot up. The client connects to the central by TCP socket, then send its name and together with A's name to get back  the result of  compatiblity. 
+
+-------------------------------------------------------------------------------------
+
+*central.cpp:
+	The scheduler boots up firstly and configures connection with the client. The scheduler receives information of three servers by UDP connections. After central receives client name information, central sends client name to server P and waits  information back. Then central  send the message to client.
+
+-------------------------------------------------------------------------------------
+
+*serverT.cpp:
+	The serverT boots up after central boots up. serverT reads "edgelist.txt"(or name_list.txt(with more names on it) file which contains vertexs and arc information of the map . I used a vector to record how many points in this file. Then I send the information of vertexs and arc back to central. Specifically, use pointer in read the infor to char array.
+
+-------------------------------------------------------------------------------------
+
+*serverS.cpp:
+	The serverS boots up after central boots up. serverS reads "scores.txt"(or scorelist.txt(with more infor on it) file which contains vertexs and scores information of the map . I used a vector to record infor in this file. Then I send the information back to central. Specifically, use pointer in read the infor to char array.
+
+-------------------------------------------------------------------------------------
+
+*serverP.cpp:
+	The serverP boots up after central boots up. Server P gets the infor of scores and edge information from the central. Then I process  the information and build a graph.  Then I used Dijkstra’s algorithm to find the shortest distance of clientA name and clientB name within the map. If the map shows the two nodes does not connect together or the map doesn't contain one of the two names, then it will print out no match. Based on the assumption of caculating ,matching gap, I get the matching gap for the shortest path of the two names. And send the matching gap infor back to central.  
+ 
+
+***************************************************************************************************
+Main fuctions for each cpp file:
+
+clientA:
+
+split(): split the string by space using stringstream and vector.
+
+main(): 1.initial the tcp with socket and connect.
+
+             2.send client name to central 
+               The client sent <INPUT1> to the Central server
+             3.receive result from central: 
+	1. After receiving output from the central : Found compatibility for <INPUT1> and <INPUT2>
+	2. After receiving output the central, no found:
+	 no compatibility for <INPUT1> and <INPUT2>
+
+-------------------------------------------------------------------------------------
+
+clientB:
+
+split(): split the string by space using stringstream and vector.
+
+main(): 1.initial the tcp with socket and connect.
+
+             2.send client name to central 
+               The client sent <INPUT1> to the Central server
+             3.receive result from central: 
+	1. After receiving output from the central : Found compatibility for <INPUT1> and <INPUT2>
+	2. After receiving output the central, no found
+
+-------------------------------------------------------------------------------------
+
+central:
+
+
+void create_bind_tcp_socket(): create TCP bind and listen
+
+void createUDPSocket(): create UDP socket to connect with three hospitals.
+
+void connectS(), void connectT(), void connectP_1(), void connectP_2(), void connectP_3():  connect with three server, for serverS and serverT.
+For serverP, send three messages gotten from serverS(score), serverT(Topology) and input name 1&2 from clientA & clientB.
+
+void send_to_serverS(), void send_to_serverT() : send query request. 
+
+void recv_from_S(), void recv_from_T(), void recv_from_P() : receive processed data from serverS ,T and final results from serverP.
+
+void receive_from_clientA() , void receive_from_clientB(): receive client name
+
+void send_to_clientA(), void send_to_clientB() :send the results back to the client
+
+
+-------------------------------------------------------------------------------------
+		
+serverT &S:
+
+void createUDPSocket(): create UDP socket to connect with central
+
+void connectToCentral(): connect to central
+
+void receiveInfor(): receive message from central.
+
+void readFile(): read the input txt file
+
+void sendToCentral(): send string back to central.
+
+-------------------------------------------------------------------------------------
+		
+serverP:
+
+void connectAndBindUDPsocket(): create UDP socket and connect to central
+
+void recvTopoplogy(), recvScore(), recvName() : receive message from central.
+
+void  readScore(),  readToplogy() :  process the receive messages. In readTopology, use Dijistra Algorithm to get the needed answer. Specifically, use adjacency matrix to build the graph. And use recursion in getting each nodes of  the shortest path and matching gap.
+
+***************************************************************************************************
+Any idiosyncrasy of your project. It should say under what conditions the project fails, if any.
+
+If the name  is too long , but we don't need to consider it.
+
+
+***************************************************************************************************
+Reused Code:
+
+*for socket connections like bind(), sendto(), recvfrom() from Beej
+
+*for Dijkstra’s algorithm from https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/
+
+*some code examples of www.cplusplus.com
+
+
+***************************************************************************************************
